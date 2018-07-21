@@ -1,0 +1,12 @@
+certifi==2018.4.16
+chardet==3.0.4
+idna==2.7
+pkginfo==1.4.2
+psutil==5.4.6
+PyYAML==3.13
+requests==2.19.1
+requests-toolbelt==0.8.0
+toml==0.9.4
+tqdm==4.23.4
+twine==1.11.0
+urllib3==1.23
