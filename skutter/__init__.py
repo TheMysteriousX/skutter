@@ -1,2 +1,3 @@
-from skutter.skutterd import *
-from skutter.configuration import *
+from .jobmanager import *
+from .configuration import *
+from .skutterd import *

@@ -1,12 +1,16 @@
-open-port:
-  check:
-    module: process
-    config:
-      name: openvpn
-      ensure: present
-  action:
-    module: firewall
-    config:
-      ports: [ 80, 443 ]
-      protocols: [ 'tcp', 'udp' ]
-      source: [ '0.0.0.0/0', '::/0']
+service:
+  systemd: False
+  rundir: '/var/run/skutter/'
+jobs:
+  open-port:
+    check:
+      module: process
+      config:
+        name: openvpn
+        ensure: present
+    action:
+      module: firewall
+      config:
+        ports: [ 80, 443 ]
+        protocols: [ 'tcp', 'udp' ]
+        source: [ '0.0.0.0/0', '::/0']
