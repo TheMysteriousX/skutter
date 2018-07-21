@@ -1,0 +1,12 @@
+open-port:
+  check:
+    module: process
+    config:
+      name: openvpn
+      ensure: present
+  action:
+    module: firewall
+    config:
+      ports: [ 80, 443 ]
+      protocols: [ 'tcp', 'udp' ]
+      source: [ '0.0.0.0/0', '::/0']

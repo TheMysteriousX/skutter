@@ -3,7 +3,8 @@
 import argparse
 import logging
 
-from skutter import Skutterd
+from skutter import Skutterd, Configuration
 
 if __name__ == 'main':
+    Configuration.load()
     Skutterd.run()
