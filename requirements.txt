@@ -3,6 +3,7 @@ chardet==3.0.4
 idna==2.7
 pkginfo==1.4.2
 psutil==5.4.6
+python-iptables==0.13.0
 PyYAML==3.13
 requests==2.19.1
 requests-toolbelt==0.8.0
