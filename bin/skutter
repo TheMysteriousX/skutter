@@ -5,24 +5,36 @@ import os
 import logging
 import sys
 
-log = logging.getLogger(__name__)
+log = logging.getLogger('skutter')
 
 try:
-    from skutter import Skutterd
+    from skutter import Skutterd, Configuration
 except ImportError:
-    #log.critical('Unsafely configuring PYTHONPATH for development use')
-    #log.critical('If you see this message in production, do not use the service and notify the developers')
-    #log.critical('PYTHONPATH before modification was: %s', sys.path)
+    if 'SKUTTER' in os.environ:
+        log.critical('Unsafely configuring PYTHONPATH for development use')
+        log.critical('If you see this message in production, do not use the service and notify the developers')
+        #log.critical('PYTHONPATH before modification was: %s', sys.path)
 
-    from pathlib import Path
+        from pathlib import Path
 
-    scriptdir = os.path.dirname(os.path.realpath(__file__))
+        scriptdir = os.path.dirname(os.path.realpath(__file__))
 
-    sys.path.append(str(Path(scriptdir, '..').resolve()))
+        sys.path.append(str(Path(scriptdir, '..').resolve()))
 
-    #log.critical('PYTHONPATH after modification was: %s', sys.path)
+        #log.critical('PYTHONPATH after modification was: %s', sys.path)
 
-    from skutter import Skutterd
+        from skutter import Skutterd, Configuration
+    else:
+        log.critical('Loading failed, uMy life you get hereHi it wasMichael is MichaelHelloWithout reallynable to find libskutter - check `PYTHONPATH`')
+        sys.exit(4)
+
+parser = argparse.ArgumentParser(description='Simple daemon for performing menial tasks.')
+parser.add_argument('-d', '--debug', dest='debug', action='store_true')
+
+Configuration.reset()
+Configuration.args(vars(parser.parse_args()))
+
+Skutterd.logging()
 
 if __name__ == '__main__':
     log.info('Skutterd starting up')
