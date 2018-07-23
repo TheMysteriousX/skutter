@@ -2,24 +2,29 @@ import os
 import sys
 
 if (sys.version_info < (3, 7)):
-    print("Python 3.7 or higher is required, please see https://www.python.org/ or your OS package repository", file=sys.stderr)
+    print("Python 3.7 or higher is required, please see https://www.python.org/ or your OS package repository",
+          file=sys.stderr)
     sys.exit(2)
 
 from setuptools import setup, find_packages
 
-long_desc=open('README.md').read()
+long_desc = open('README.md').read()
 
 if os.path.exists('README.rst'):
     long_desc = open('README.rst').read()
 
 setup(
     name='skutter',
-    version='0.2',
+    version='0.3',
     packages=find_packages(),
+    scripts=['bin/skutter'],
     entry_points={
-        'console_scripts': [
-            'skutter=bin.skutter:main',
+        'skutter.plugins.checks': [
+            'process=skutter.checks:Process',
         ],
+        'skutter.plugins.actions': [
+            'iptables=skutter.actions:IPTables',
+        ]
     },
 
     license='GNU GPL v3',

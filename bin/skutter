@@ -20,6 +20,8 @@ except ImportError:
         scriptdir = os.path.dirname(os.path.realpath(__file__))
 
         sys.path.append(str(Path(scriptdir, '..').resolve()))
+        sys.path.append(str(Path(scriptdir, '../skutter').resolve()))
+
 
         #log.critical('PYTHONPATH after modification was: %s', sys.path)
 

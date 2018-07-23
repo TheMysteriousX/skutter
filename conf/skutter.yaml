@@ -9,7 +9,7 @@ jobs:
         name: openvpn
         ensure: present
     action:
-      module: firewall
+      module: iptables
       config:
         ports: [ 80, 443 ]
         protocols: [ 'tcp', 'udp' ]

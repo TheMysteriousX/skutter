@@ -22,6 +22,7 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
+
 class Skutterd(object):
     _run = True
     _SIGTERM = (False, None)
