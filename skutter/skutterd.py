@@ -52,9 +52,12 @@ class Skutterd(object):
         cls._loop.add_signal_handler(signal.SIGTERM, functools.partial(cls.signal, signal.SIGTERM))
 
         # Set up Job Managers
-        cls._jobs = Configuration.get_job_managers()
-        for j in cls._jobs:
-            j.init()
+        for j in Configuration.get_job_managers():
+            if j.init():
+                cls._jobs.append(j)
+            else:
+                log.error("Failed to load job named %s", j.get_name())
+
 
         # Enter main loop
         cls.loop()
@@ -107,6 +110,11 @@ class Skutterd(object):
             while cls._run:
                 try:
                     tasks = [x.poll() for x in cls._jobs]
+
+                    if len(tasks) == 0:
+                        log.error('No jobs found or all jobs failed to load - exiting')
+                        cls._run = False
+                        return
 
                     finished, unfinished = cls._loop.run_until_complete(asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED))
 

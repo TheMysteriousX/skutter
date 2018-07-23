@@ -39,14 +39,14 @@ class Configuration(object):
     @classmethod
     def parse_jobs(cls, conf: dict) -> None:
         log.debug("Parsing configuration: root:jobs")
-        cls._jobs = [cls.parse_job(y) for x, y in conf.items()]
+        cls._jobs = [cls.parse_job(y, JobManager(x)) for x, y in conf.items()]
 
     @classmethod
-    def parse_job(cls, conf: dict) -> JobManager:
+    def parse_job(cls, conf: dict, j: JobManager) -> JobManager:
         log.debug("Parsing configuration: root:jobs:job")
-        j = JobManager()
         j.check(*cls.parse_check(conf['check']))
-        j.action(*cls.parse_action(conf['action']))
+        j.paction(*cls.parse_action(conf['positive-action']))
+        j.naction(*cls.parse_action(conf['negative-action']))
         return j
 
     @classmethod
@@ -62,7 +62,8 @@ class Configuration(object):
     @classmethod
     def get_job_managers(cls) -> list:
         log.debug("Returning %i job managers", len(cls._jobs))
-        return cls._jobs
+        for j in cls._jobs:
+            yield j
 
     @classmethod
     def get(cls, key: str) -> Any:

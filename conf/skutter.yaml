@@ -7,9 +7,17 @@ jobs:
       module: process
       config:
         name: openvpn
-    action:
+    positive-action:
       module: iptables
       config:
+        action: accept
+        ports: [ 80, 443 ]
+        protocols: [ 'tcp', 'udp' ]
+        source: [ '0.0.0.0/0', '::/0']
+    negative-action:
+      module: iptables
+      config:
+        action: drop
         ports: [ 80, 443 ]
         protocols: [ 'tcp', 'udp' ]
         source: [ '0.0.0.0/0', '::/0']

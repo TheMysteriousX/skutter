@@ -1,4 +1,12 @@
-import iptc
+import logging
+
+log = logging.getLogger(__name__)
+
+try:
+    import iptc
+except FileNotFoundError:
+    log.error('Unable to load iptc, are we actually running on Linux?')
+    raise
 
 
 class IPTables(object):
@@ -26,3 +34,6 @@ class IPTables(object):
     def insert_rule(self, action: str) -> bool:
         if self._rule.commit():
             return True
+
+    def act(self):
+        pass
