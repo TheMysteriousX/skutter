@@ -1,11 +1,13 @@
+import asyncio
+import functools
 import logging
 import os
 import signal
 import sys
-import time
 import traceback
 import types
 
+from asyncio import CancelledError
 from logging.handlers import SysLogHandler
 
 from skutter import Configuration
@@ -31,6 +33,8 @@ class Skutterd(object):
 
     _jobs = []
 
+    _loop = None
+
     @classmethod
     def run(cls) -> None:
         # Load and prepare configuration
@@ -41,6 +45,12 @@ class Skutterd(object):
         if Configuration.get('systemd'):
             cls.daemonise()
 
+        # Switch on the event loop
+        cls._loop = asyncio.get_event_loop()
+        cls._loop.add_signal_handler(signal.SIGHUP, functools.partial(cls.signal, signal.SIGHUP))
+        cls._loop.add_signal_handler(signal.SIGINT, functools.partial(cls.signal, signal.SIGINT))
+        cls._loop.add_signal_handler(signal.SIGTERM, functools.partial(cls.signal, signal.SIGTERM))
+
         # Set up Job Managers
         cls._jobs = Configuration.get_job_managers()
         for j in cls._jobs:
@@ -48,6 +58,15 @@ class Skutterd(object):
 
         # Enter main loop
         cls.loop()
+
+        # We're exiting, close the event loop
+        cls._loop.close()
+
+    @classmethod
+    def terminate(cls):
+        # Cancel all tasks
+        for task in asyncio.Task.all_tasks():
+            task.cancel()
 
     @classmethod
     def daemonise(cls) -> None:
@@ -86,8 +105,21 @@ class Skutterd(object):
     def loop(cls) -> None:
         while True:
             while cls._run:
-                print("Loop")
-                time.sleep(5)
+                try:
+                    tasks = [x.poll() for x in cls._jobs]
+
+                    finished, unfinished = cls._loop.run_until_complete(asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED))
+
+                    log.debug('Checking for finished tasks')
+
+                    for task in finished:
+                        job = task.result()
+                        log.debug("Job with check %s returned, new state is %s", job._check_module, job._current_state)
+
+                        job.act()
+                        unfinished.add(job)
+                except CancelledError as e:
+                    log.debug("Tasks were cancelled, was a signal received?")
 
             if cls.handle_signal():
                 break
@@ -100,7 +132,6 @@ class Skutterd(object):
             # Not supported yet
             cls._SIGHUP = (False, None)
             cls._run = True
-
 
         if cls._SIGINT[0]:
             cls._SIGINT = (False, None)
@@ -115,16 +146,20 @@ class Skutterd(object):
         return terminate
 
     @classmethod
-    def signal(cls, signum: int, frame: types.FrameType) -> None:
+    def signal(cls, signum: int, frame: types.FrameType=None) -> None:
+        log.info("Signal %i recieved", signum)
 
         if signum == signal.SIGHUP:
             cls._SIGHUP = (True, frame)
+            cls.terminate()
 
         elif signum == signal.SIGINT:
             cls._SIGINT = (True, frame)
+            cls.terminate()
 
         elif signum == signal.SIGTERM:
             cls._SIGTERM = (True, frame)
+            cls.terminate()
 
         cls._run = False
 

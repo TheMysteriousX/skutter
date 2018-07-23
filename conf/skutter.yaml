@@ -7,7 +7,6 @@ jobs:
       module: process
       config:
         name: openvpn
-        ensure: present
     action:
       module: iptables
       config:
