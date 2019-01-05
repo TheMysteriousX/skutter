@@ -5,8 +5,8 @@ pbr==4.1.1
 pkginfo==1.4.2
 psutil==5.4.6
 python-iptables==0.13.0
-PyYAML==3.13
-requests==2.19.1
+PyYAML==4.2b4
+requests==2.21.0
 requests-toolbelt==0.8.0
 six==1.11.0
 stevedore==1.29.0
