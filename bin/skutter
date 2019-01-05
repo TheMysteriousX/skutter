@@ -22,12 +22,11 @@ except ImportError:
         sys.path.append(str(Path(scriptdir, '..').resolve()))
         sys.path.append(str(Path(scriptdir, '../skutter').resolve()))
 
-
         log.debug('PYTHONPATH after modification was: %s', sys.path)
 
         from skutter import Skutterd, Configuration
     else:
-        log.critical('Loading failed, uMy life you get hereHi it wasMichael is MichaelHelloWithout reallynable to find libskutter - check `PYTHONPATH`')
+        log.critical('Loading failed, unable to find libskutter - check `PYTHONPATH`')
         sys.exit(4)
 
 parser = argparse.ArgumentParser(description='Simple daemon for performing menial tasks.')
