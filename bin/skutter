@@ -13,7 +13,7 @@ except ImportError:
     if 'SKUTTER' in os.environ:
         log.critical('Unsafely configuring PYTHONPATH for development use')
         log.critical('If you see this message in production, do not use the service and notify the developers')
-        #log.critical('PYTHONPATH before modification was: %s', sys.path)
+        log.debug('PYTHONPATH before modification was: %s', sys.path)
 
         from pathlib import Path
 
@@ -23,7 +23,7 @@ except ImportError:
         sys.path.append(str(Path(scriptdir, '../skutter').resolve()))
 
 
-        #log.critical('PYTHONPATH after modification was: %s', sys.path)
+        log.debug('PYTHONPATH after modification was: %s', sys.path)
 
         from skutter import Skutterd, Configuration
     else:
