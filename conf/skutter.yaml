@@ -1,6 +1,8 @@
 service:
   systemd: False
   rundir: '/var/run/skutter/'
+  v6-only: True
+  self-uuid: '26c00d92-17fd-429c-9165-e94c37468b0f'
 jobs:
   open-port:
     check:
@@ -10,14 +12,16 @@ jobs:
     positive-action:
       module: iptables
       config:
-        action: accept
-        ports: [ 80, 443 ]
-        protocols: [ 'tcp', 'udp' ]
-        source: [ '0.0.0.0/0', '::/0']
+        target: accept
+        match:
+          ports: [ 80, 443 ]
+          protocol: 'tcp'
+          source: [ '0.0.0.0/0', '::/0']
     negative-action:
       module: iptables
       config:
-        action: drop
-        ports: [ 80, 443 ]
-        protocols: [ 'tcp', 'udp' ]
-        source: [ '0.0.0.0/0', '::/0']
+        target: drop
+        match:
+          port: [ 80, 443 ]
+          protocol: 'tcp'
+          source: [ '0.0.0.0/0', '::/0']

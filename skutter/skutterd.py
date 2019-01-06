@@ -41,8 +41,8 @@ class Skutterd(object):
         Configuration.load(Configuration.get('conf'))
         Configuration.parse()
 
-        # If we're not running under systemd, do the double fork dance
-        if Configuration.get('systemd'):
+        # If we're not running under systemd and not in debug mode, do the double fork dance
+        if Configuration.get('systemd') and 'SKUTTER' not in os.environ:
             cls.daemonise()
 
         # Switch on the event loop
@@ -57,7 +57,6 @@ class Skutterd(object):
                 cls._jobs.append(j)
             else:
                 log.error("Failed to load job named %s", j.get_name())
-
 
         # Enter main loop
         cls.loop()
@@ -154,8 +153,8 @@ class Skutterd(object):
         return terminate
 
     @classmethod
-    def signal(cls, signum: int, frame: types.FrameType=None) -> None:
-        log.info("Signal %i recieved", signum)
+    def signal(cls, signum: int, frame: types.FrameType = None) -> None:
+        log.info("Signal %i received", signum)
 
         if signum == signal.SIGHUP:
             cls._SIGHUP = (True, frame)
@@ -207,6 +206,7 @@ class Skutterd(object):
             traceback.print_exc()
 
             sys.exit(Configuration.BROKEN_LOGGING)
+
 
 # Signal Handlers
 signal.signal(signal.SIGHUP, Skutterd.signal)

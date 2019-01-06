@@ -24,7 +24,7 @@ class Process(object):
     def get_pid(self) -> Union[None, int]:
         log.debug("Hunting for process named %s", self._process)
         for p in psutil.process_iter():
-            #log.debug('Examining process %s', p.name())
+            log.debug('Examining process %s', p.name())
 
             if p.name() == self._process:
                 return p.pid
