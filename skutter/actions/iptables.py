@@ -68,7 +68,7 @@ class IPTables(object):
             self._dests = [ip_network(ip) for ip in conf['match']['sources']]
 
         self._rule4 = iptc.Rule()
-        self._rule6 = iptc.Rule()
+        self._rule6 = iptc.Rule6()
 
     def rule_builder(self):
         if not Configuration.get('v6-only'):
@@ -123,12 +123,16 @@ class IPTables(object):
     def insert_rule4(self, rule: iptc.Rule) -> bool:
         return self.chain4.insert_rule(rule)
 
-    def insert_rule6(self, rule: iptc.Rule) -> bool:
+    def insert_rule6(self, rule: iptc.Rule6) -> bool:
         return self.chain4.insert_rule(rule)
 
-    def act(self):
+    def do(self):
         self.insert_rule4(self._rule4)
         self.insert_rule6(self._rule6)
+
+    def undo(self):
+        self.del_rule4(self._rule4)
+        self.del_rule6(self._rule6)
 
     def cleanup4(self):
         for rule in self._chain4:

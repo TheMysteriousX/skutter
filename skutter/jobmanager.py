@@ -66,7 +66,6 @@ class JobManager(object):
             log.error("%s encountered an exception while loading check plugin called %s", self._name, self._naction_module)
             return False
 
-
         try:
             self._paction = stevedore.DriverManager(namespace='skutter.plugins.actions',
                                                     name=self._paction_module,
@@ -110,6 +109,8 @@ class JobManager(object):
 
     def act(self):
         if self._current_state == POSITIVE:
-            self._paction.act()
+            self._naction.undo()
+            self._paction.do()
         else:
-            self._naction.act()
+            self._paction.undo()
+            self._naction.do()
