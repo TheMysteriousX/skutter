@@ -6,6 +6,7 @@ from ipaddress import ip_network, IPv4Network, IPv6Network
 from typing import List
 
 from skutter import Configuration
+from skutter.actions import ActionBase
 
 log = logging.getLogger(__name__)
 
@@ -17,11 +18,14 @@ except FileNotFoundError as e:
     if 'SKUTTER' in os.environ:
         log.critical('Mocking iptc for development use')
         log.critical('If you see this message in production, do not use the service and notify the developers')
+
+        from unittest.mock import MagicMock
+        iptc = MagicMock()
     else:
         raise e
 
 
-class IPTables(object):
+class IPTables(ActionBase):
     _tables = {'filter': iptc.Table.FILTER,
                'mangle': iptc.Table.MANGLE,
                'nat': iptc.Table.NAT,
@@ -56,19 +60,26 @@ class IPTables(object):
         self.chain4 = iptc.Chain(self._table4, chain)
         self.chain6 = iptc.Chain(self._table6, chain)
 
-        self._target = conf['target']
+        if 'proto' in conf['match']:
+            self._target = conf['target']
 
-        self._ports = conf['match']['ports']
-        self._proto = conf['match']['protocol']
+        if 'ports' in conf['match']:
+            self._ports = conf['match']['ports']
 
-        if conf['match']['sources']:
+        if 'ports' in conf['match']:
+            self._proto = conf['match']['protocol']
+
+        if 'sources' in conf['match']:
             self._sources = [ip_network(ip) for ip in conf['match']['sources']]
 
-        if conf['match']['destinations']:
+        if 'destinations' in conf['match']:
             self._dests = [ip_network(ip) for ip in conf['match']['sources']]
 
         self._rule4 = iptc.Rule()
         self._rule6 = iptc.Rule6()
+
+        log.info('Built IPTables rule: %s', self._rule4)
+        log.info('Built IPTables rule: %s', self._rule6)
 
     def rule_builder(self):
         if not Configuration.get('v6-only'):
@@ -110,21 +121,29 @@ class IPTables(object):
 
             uid = str(uuid.uuid4())
             m = r.create_match("comment")
-            m.comment(f'skutter-{uid}')
+            m.comment(f"{Configuration.get('self-uuid')}-{uid}")
 
             self._uuids.append(uid)
 
     def del_rule4(self, rule: iptc.Rule) -> bool:
-        return self._chain4.delete_rule(rule)
+        log.info("Deleting rule4 from chain")
+        if self._chain4 is not None:
+            return self._chain4.delete_rule(rule)
 
     def del_rule6(self, rule: iptc.Rule6) -> bool:
-        return self._chain6.delete_rule(rule)
+        log.info("Deleting rule6 from chain")
+        if self._chain6 is not None:
+            return self._chain6.delete_rule(rule)
 
     def insert_rule4(self, rule: iptc.Rule) -> bool:
-        return self.chain4.insert_rule(rule)
+        log.info("Inserting rule4 into chain")
+        if self._chain4 is not None:
+            return self._chain4.insert_rule(rule)
 
     def insert_rule6(self, rule: iptc.Rule6) -> bool:
-        return self.chain4.insert_rule(rule)
+        log.info("Inserting rule6 into chain")
+        if self._chain6 is not None:
+            return self._chain6.insert_rule(rule)
 
     def do(self):
         self.insert_rule4(self._rule4)
@@ -135,18 +154,24 @@ class IPTables(object):
         self.del_rule6(self._rule6)
 
     def cleanup4(self):
-        for rule in self._chain4:
-            for match in rule.matches:
-                if match.name == 'comment':
-                    if match.parameters['comment'].startswith(Configuration.get('self-uuid')):
-                        self.del_rule4(rule)
+        log.info("Cleaning up all rule4 with comment prefix: %s", Configuration.get('self-uuid'))
+
+        if self._chain4 is not None:
+            for rule in self._chain4:
+                for match in rule.matches:
+                    if match.name == 'comment':
+                        if match.parameters['comment'].startswith(Configuration.get('self-uuid')):
+                            self.del_rule4(rule)
 
     def cleanup6(self):
-        for rule in self._chain6:
-            for match in rule.matches:
-                if match.name == 'comment':
-                    if match.parameters['comment'].startswith(Configuration.get('self-uuid')):
-                        self.del_rule6(rule)
+        log.info("Cleaning up all rule6 with comment prefix: %s", Configuration.get('self-uuid'))
+
+        if self._chain6 is not None:
+            for rule in self._chain6:
+                for match in rule.matches:
+                    if match.name == 'comment':
+                        if match.parameters['comment'].startswith(Configuration.get('self-uuid')):
+                            self.del_rule6(rule)
 
     def __del__(self):
         self.cleanup4()

@@ -40,3 +40,6 @@ Skutterd.logging()
 if __name__ == '__main__':
     log.info('Skutterd starting up')
     Skutterd.run()
+
+    # Skutter has terminated, flush the log handlers
+    [h.flush() for h in log.handlers]

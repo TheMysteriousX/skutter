@@ -16,7 +16,7 @@ jobs:
         match:
           ports: [ 80, 443 ]
           protocol: 'tcp'
-          source: [ '0.0.0.0/0', '::/0']
+          sources: [ '0.0.0.0/0', '::/0']
     negative-action:
       module: iptables
       config:
@@ -24,4 +24,4 @@ jobs:
         match:
           port: [ 80, 443 ]
           protocol: 'tcp'
-          source: [ '0.0.0.0/0', '::/0']
+          sources: [ '0.0.0.0/0', '::/0']

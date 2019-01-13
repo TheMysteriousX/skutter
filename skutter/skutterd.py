@@ -207,7 +207,6 @@ class Skutterd(object):
 
             sys.exit(Configuration.BROKEN_LOGGING)
 
-
 # Signal Handlers
 signal.signal(signal.SIGHUP, Skutterd.signal)
 signal.signal(signal.SIGINT, Skutterd.signal)

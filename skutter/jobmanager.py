@@ -109,8 +109,8 @@ class JobManager(object):
 
     def act(self):
         if self._current_state == POSITIVE:
-            self._naction.undo()
-            self._paction.do()
+            self._naction.driver.undo()
+            self._paction.driver.do()
         else:
-            self._paction.undo()
-            self._naction.do()
+            self._paction.driver.undo()
+            self._naction.driver.do()
