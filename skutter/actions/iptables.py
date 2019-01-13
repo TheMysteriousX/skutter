@@ -114,15 +114,15 @@ class IPTables(ActionBase):
             log.debug('Set rule4 proto: %s', self._rule4.protocol)
 
         if self._ports:
-            self._rule4.dport = ','.join(self._ports)
+            self._rule4.dport = ','.join([str(i) for i in self._ports])
             log.debug('Set rule4 dport: %s', self._rule4.dport)
 
         if self._sources:
-            self._rule4.src = ','.join([ip.compressed for ip in self._sources if isinstance(IPv4Network, ip)])
+            self._rule4.src = ','.join([ip.compressed for ip in self._sources if isinstance(ip, IPv4Network)])
             log.debug('Set rule4 src: %s', self._rule4.src)
 
         if self._dests:
-            self._rule4.dst = ','.join([ip.compressed for ip in self._dests if isinstance(IPv4Network, ip)])
+            self._rule4.dst = ','.join([ip.compressed for ip in self._dests if isinstance(ip, IPv4Network)])
             log.debug('Set rule4 src: %s', self._rule4.dst)
 
         uid = str(uuid.uuid4())
@@ -142,15 +142,15 @@ class IPTables(ActionBase):
             log.debug('Set rule6 proto: %s', self._rule6.protocol)
 
         if self._ports:
-            self._rule6.dport = ','.join(self._ports)
+            self._rule6.dport = ','.join([str(i) for i in self._ports])
             log.debug('Set rule6 dport: %s', self._rule6.dport)
 
         if self._sources:
-            self._rule6.src = ','.join([ip.compressed for ip in self._sources if isinstance(IPv6Network, ip)])
+            self._rule6.src = ','.join([ip.compressed for ip in self._sources if isinstance(ip, IPv6Network)])
             log.debug('Set rule6 src: %s', self._rule6.src)
 
         if self._dests:
-            self._rule6.dst = ','.join([ip.compressed for ip in self._dests if isinstance(IPv6Network, ip)])
+            self._rule6.dst = ','.join([ip.compressed for ip in self._dests if isinstance(ip, IPv6Network)])
             log.debug('Set rule6 src: %s', self._rule6.dst)
 
         uid = str(uuid.uuid4())
