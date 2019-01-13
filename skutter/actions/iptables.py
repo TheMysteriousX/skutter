@@ -59,30 +59,45 @@ class IPTables(ActionBase):
     def __init__(self, conf: dict) -> None:
         self._table4 = iptc.Table(self._tables[conf['table'] if 'table' in conf else 'filter'])
         self._table6 = iptc.Table6(self._tables[conf['table'] if 'table' in conf else 'filter'])
+        log.debug('iptables._table4 == %s', self._table4)
+        log.debug('iptables._table6 == %s', self._table6)
 
         chain = conf['chain'] if 'chain' in conf else 'INPUT'
+
         self.chain4 = iptc.Chain(self._table4, chain)
         self.chain6 = iptc.Chain(self._table6, chain)
+        log.debug('iptables._chain4 == %s', chain)
+        log.debug('iptables._chain6 == %s', chain)
 
-        if 'proto' in conf['match']:
+        if 'target' in conf:
             self._target = self._targets[conf['target']]
+            log.debug('iptables._target == %s', self._target)
 
         if 'ports' in conf['match']:
             self._ports = conf['match']['ports']
+            log.debug('iptables._ports == %s', self._ports)
 
         if 'ports' in conf['match']:
             self._proto = conf['match']['protocol']
+            log.debug('iptables._proto == %s', self._proto)
 
         if 'sources' in conf['match']:
             self._sources = [ip_network(ip) for ip in conf['match']['sources']]
+            log.debug('iptables._sources == %s', self._sources)
 
         if 'destinations' in conf['match']:
             self._dests = [ip_network(ip) for ip in conf['match']['sources']]
+            log.debug('iptables._dests == %s', self._dests)
 
         self._rule4 = iptc.Rule()
         self._rule6 = iptc.Rule6()
 
-        self.rule_builder()
+        try:
+            self.rule_builder()
+        except ValueError as e:
+            log.error('An error was encountered while initialising the IPTables plugin')
+            log.debug(e)
+            raise e
 
     def rule_builder(self):
         if not Configuration.get('v6-only'):
