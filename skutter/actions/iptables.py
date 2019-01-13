@@ -32,6 +32,10 @@ class IPTables(ActionBase):
                'security': iptc.Table.SECURITY
                }
 
+    _targets = {'accept': 'ACCEPT',
+                'drop': 'DROP',
+                }
+
     _uuids: List[str] = []
 
     _table4 = None
@@ -61,7 +65,7 @@ class IPTables(ActionBase):
         self.chain6 = iptc.Chain(self._table6, chain)
 
         if 'proto' in conf['match']:
-            self._target = conf['target']
+            self._target = self._targets[conf['target']]
 
         if 'ports' in conf['match']:
             self._ports = conf['match']['ports']
@@ -90,34 +94,45 @@ class IPTables(ActionBase):
     def rule_builder4(self):
         with self._rule4 as r:
             r.target = iptc.Target(r, self._target)
+            log.debug('Set rule4 target: %s', r.target)
 
             if self._proto:
                 r.protocol = self._proto
+                log.debug('Set rule4 proto: %s', r.protocol)
 
             if self._ports:
                 r.dport = ','.join(self._ports)
+                log.debug('Set rule4 dport: %s', r.dport)
 
             if self._sources:
                 r.src = ','.join([ip.compressed for ip in self._sources if isinstance(IPv4Network, ip)])
+                log.debug('Set rule4 src: %s', r.src)
 
             if self._dests:
                 r.dst = ','.join([ip.compressed for ip in self._dests if isinstance(IPv4Network, ip)])
+                log.debug('Set rule4 src: %s', r.dst)
+
 
     def rule_builder6(self):
         with self._rule6 as r:
             r.target = iptc.Target(r, self._target)
+            log.debug('Set rule6 target: %s', r.target)
 
             if self._proto:
                 r.protocol = self._proto
+                log.debug('Set rule6 proto: %s', r.protocol)
 
             if self._ports:
                 r.dport = ','.join(self._ports)
+                log.debug('Set rule6 dport: %s', r.dport)
 
             if self._sources:
                 r.src = ','.join([ip.compressed for ip in self._sources if isinstance(IPv6Network, ip)])
+                log.debug('Set rule6 src: %s', r.src)
 
             if self._dests:
                 r.dst = ','.join([ip.compressed for ip in self._dests if isinstance(IPv6Network, ip)])
+                log.debug('Set rule6 src: %s', r.dst)
 
             uid = str(uuid.uuid4())
             m = r.create_match("comment")

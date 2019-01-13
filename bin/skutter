@@ -31,7 +31,7 @@ except ImportError:
 
 parser = argparse.ArgumentParser(description='Simple daemon for performing menial tasks.')
 parser.add_argument('-d', '--debug', dest='debug', action='store_true')
-parser.add_argument('-c', '--config', dest='conf', action='store_const')
+parser.add_argument('-c', '--config', dest='conf', action='store', default='/etc/skutter/skutter.yaml')
 
 Configuration.reset()
 Configuration.args(vars(parser.parse_args()))

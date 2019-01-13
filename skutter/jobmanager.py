@@ -61,9 +61,11 @@ class JobManager(object):
                                                   )
         except NoMatches as e:
             log.error("%s unable to find check plugin called %s", self._name, self._check_module)
+            log.debug(e)
             return False
-        except (FileNotFoundError, ImportError):
+        except (FileNotFoundError, ImportError) as e:
             log.error("%s encountered an exception while loading check plugin called %s", self._name, self._naction_module)
+            log.debug(e)
             return False
 
         try:
@@ -75,8 +77,9 @@ class JobManager(object):
         except NoMatches as e:
             log.error("%s unable to find action plugin called %s", self._name, self._paction_module)
             return False
-        except (FileNotFoundError, ImportError):
+        except (FileNotFoundError, ImportError) as e:
             log.error("%s encountered an exception while loading action plugin called %s", self._name, self._paction_module)
+            log.debug(e)
             return False
 
         try:
@@ -88,8 +91,9 @@ class JobManager(object):
         except NoMatches:
             log.error("%s unable to find action plugin called %s", self._name, self._naction_module)
             return False
-        except (FileNotFoundError, ImportError):
+        except (FileNotFoundError, ImportError) as e:
             log.error("%s encountered an exception while loading action plugin called %s", self._name, self._naction_module)
+            log.debug(e)
             return False
 
         return True
