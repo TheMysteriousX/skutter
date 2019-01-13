@@ -54,6 +54,7 @@ class JobManager(object):
                   self._naction_module)
 
         try:
+            log.info('Attempting to load check plugin %s', self._check_module)
             self._check = stevedore.DriverManager(namespace='skutter.plugins.checks',
                                                   name=self._check_module,
                                                   invoke_on_load=True,
@@ -69,6 +70,7 @@ class JobManager(object):
             return False
 
         try:
+            log.info('Attempting to load paction plugin %s', self._paction_module)
             self._paction = stevedore.DriverManager(namespace='skutter.plugins.actions',
                                                     name=self._paction_module,
                                                     invoke_on_load=True,
@@ -83,6 +85,7 @@ class JobManager(object):
             return False
 
         try:
+            log.info('Attempting to load naction plugin %s', self._naction_module)
             self._naction = stevedore.DriverManager(namespace='skutter.plugins.actions',
                                                     name=self._naction_module,
                                                     invoke_on_load=True,

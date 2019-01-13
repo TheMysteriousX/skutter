@@ -50,13 +50,15 @@ class IPTables(ActionBase):
     _target = None
 
     _ports = None
-    _protos = None
+    _proto = None
     _sources = None
     _dests = None
     _interfaces = None
     _state = None
 
     def __init__(self, conf: dict) -> None:
+        log.debug('IPTables plugin initialising with config: %s', conf)
+
         self._table4 = iptc.Table(self._tables[conf['table'] if 'table' in conf else 'filter'])
         self._table6 = iptc.Table6(self._tables[conf['table'] if 'table' in conf else 'filter'])
         log.debug('iptables._table4 == %s', self._table4)
