@@ -1,8 +1,8 @@
 import os
 import sys
 
-if (sys.version_info < (3, 7)):
-    print("Python 3.7 or higher is required, please see https://www.python.org/ or your OS package repository",
+if (sys.version_info < (3, 6)):
+    print("Python 3.6 or higher is required, please see https://www.python.org/ or your OS package repository",
           file=sys.stderr)
     sys.exit(2)
 
