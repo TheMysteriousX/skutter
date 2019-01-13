@@ -15,7 +15,7 @@ if os.path.exists('README.rst'):
 
 setup(
     name='skutter',
-    version='0.3',
+    version='0.4',
     packages=find_packages(),
     scripts=['bin/skutter'],
     entry_points={
@@ -26,6 +26,15 @@ setup(
             'iptables=skutter.actions:IPTables',
         ]
     },
+
+    install_requires=[
+        'pbr',
+        'psutil',
+        'python-iptables',
+        'PyYAML',
+        'six',
+        'stevedore',
+    ],
 
     license='GNU GPL v3',
     long_description=long_desc,
