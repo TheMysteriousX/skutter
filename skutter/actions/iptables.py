@@ -127,7 +127,7 @@ class IPTables(ActionBase):
 
         uid = str(uuid.uuid4())
         m = self._rule4.create_match("comment")
-        m.comment(f"{Configuration.get('self-uuid')}-{uid}")
+        m.comment = f"{Configuration.get('self-uuid')}-{uid}"
 
         self._uuids.append(uid)
 
@@ -155,7 +155,7 @@ class IPTables(ActionBase):
 
         uid = str(uuid.uuid4())
         m = self._rule6.create_match("comment")
-        m.comment(f"{Configuration.get('self-uuid')}-{uid}")
+        m.comment = f"{Configuration.get('self-uuid')}-{uid}"
 
         self._uuids.append(uid)
 
