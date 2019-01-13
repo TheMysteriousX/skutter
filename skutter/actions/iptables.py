@@ -91,60 +91,58 @@ class IPTables(ActionBase):
         self.rule_builder6()
 
     def rule_builder4(self):
-        with self._rule4 as r:
-            r.target = iptc.Target(r, self._target)
-            log.debug('Set rule4 target: %s', r.target)
+        self._rule4.target = iptc.Target(self._rule4, self._target)
+        log.debug('Set rule4 target: %s', self._rule4.target)
 
-            if self._proto:
-                r.protocol = self._proto
-                log.debug('Set rule4 proto: %s', r.protocol)
+        if self._proto:
+            self._rule4.protocol = self._proto
+            log.debug('Set rule4 proto: %s', self._rule4.protocol)
 
-            if self._ports:
-                r.dport = ','.join(self._ports)
-                log.debug('Set rule4 dport: %s', r.dport)
+        if self._ports:
+            self._rule4.dport = ','.join(self._ports)
+            log.debug('Set rule4 dport: %s', self._rule4.dport)
 
-            if self._sources:
-                r.src = ','.join([ip.compressed for ip in self._sources if isinstance(IPv4Network, ip)])
-                log.debug('Set rule4 src: %s', r.src)
+        if self._sources:
+            self._rule4.src = ','.join([ip.compressed for ip in self._sources if isinstance(IPv4Network, ip)])
+            log.debug('Set rule4 src: %s', self._rule4.src)
 
-            if self._dests:
-                r.dst = ','.join([ip.compressed for ip in self._dests if isinstance(IPv4Network, ip)])
-                log.debug('Set rule4 src: %s', r.dst)
+        if self._dests:
+            self._rule4.dst = ','.join([ip.compressed for ip in self._dests if isinstance(IPv4Network, ip)])
+            log.debug('Set rule4 src: %s', self._rule4.dst)
 
-            uid = str(uuid.uuid4())
-            m = r.create_match("comment")
-            m.comment(f"{Configuration.get('self-uuid')}-{uid}")
+        uid = str(uuid.uuid4())
+        m = self._rule4.create_match("comment")
+        m.comment(f"{Configuration.get('self-uuid')}-{uid}")
 
-            self._uuids.append(uid)
+        self._uuids.append(uid)
 
         log.info('Built IPTables rule: %s', self._rule4)
 
     def rule_builder6(self):
-        with self._rule6 as r:
-            r.target = iptc.Target(r, self._target)
-            log.debug('Set rule6 target: %s', r.target)
+        self._rule6.target = iptc.Target(self._rule6, self._target)
+        log.debug('Set rule6 target: %s', self._rule6.target)
 
-            if self._proto:
-                r.protocol = self._proto
-                log.debug('Set rule6 proto: %s', r.protocol)
+        if self._proto:
+            self._rule6.protocol = self._proto
+            log.debug('Set rule6 proto: %s', self._rule6.protocol)
 
-            if self._ports:
-                r.dport = ','.join(self._ports)
-                log.debug('Set rule6 dport: %s', r.dport)
+        if self._ports:
+            self._rule6.dport = ','.join(self._ports)
+            log.debug('Set rule6 dport: %s', self._rule6.dport)
 
-            if self._sources:
-                r.src = ','.join([ip.compressed for ip in self._sources if isinstance(IPv6Network, ip)])
-                log.debug('Set rule6 src: %s', r.src)
+        if self._sources:
+            self._rule6.src = ','.join([ip.compressed for ip in self._sources if isinstance(IPv6Network, ip)])
+            log.debug('Set rule6 src: %s', self._rule6.src)
 
-            if self._dests:
-                r.dst = ','.join([ip.compressed for ip in self._dests if isinstance(IPv6Network, ip)])
-                log.debug('Set rule6 src: %s', r.dst)
+        if self._dests:
+            self._rule6.dst = ','.join([ip.compressed for ip in self._dests if isinstance(IPv6Network, ip)])
+            log.debug('Set rule6 src: %s', self._rule6.dst)
 
-            uid = str(uuid.uuid4())
-            m = r.create_match("comment")
-            m.comment(f"{Configuration.get('self-uuid')}-{uid}")
+        uid = str(uuid.uuid4())
+        m = self._rule6.create_match("comment")
+        m.comment(f"{Configuration.get('self-uuid')}-{uid}")
 
-            self._uuids.append(uid)
+        self._uuids.append(uid)
 
         log.info('Built IPTables rule: %s', self._rule6)
 
