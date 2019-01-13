@@ -16,7 +16,7 @@ class Configuration(object):
     _defaults = {
         'systemd': False,
         'rundir': '/var/run/skutter/',
-        'conf': './conf/skutter.yaml'
+        'conf': '/etc/skutter/skutter.yaml'
     }
 
     @classmethod
