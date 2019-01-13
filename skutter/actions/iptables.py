@@ -36,26 +36,6 @@ class IPTables(ActionBase):
                 'drop': 'DROP',
                 }
 
-    _uuids: List[str] = []
-
-    _table4 = None
-    _table6 = None
-
-    _rule4 = None
-    _rule6 = None
-
-    _chain4 = None
-    _chain6 = None
-
-    _target = None
-
-    _ports = None
-    _proto = None
-    _sources = None
-    _dests = None
-    _interfaces = None
-    _state = None
-
     def __init__(self, conf: dict) -> None:
         log.debug('IPTables plugin initialising with config: %s', conf)
 
@@ -66,33 +46,45 @@ class IPTables(ActionBase):
 
         chain = conf['chain'] if 'chain' in conf else 'INPUT'
 
-        self.chain4 = iptc.Chain(self._table4, chain)
-        self.chain6 = iptc.Chain(self._table6, chain)
+        self._chain4 = iptc.Chain(self._table4, chain)
+        self._chain6 = iptc.Chain(self._table6, chain)
         log.debug('iptables._chain4 == %s', chain)
         log.debug('iptables._chain6 == %s', chain)
 
         if 'target' in conf:
             self._target = self._targets[conf['target']]
-            log.debug('iptables._target == %s', self._target)
+        else:
+            self._target = None
+        log.debug('iptables._target == %s', self._target)
 
         if 'ports' in conf['match']:
             self._ports = conf['match']['ports']
-            log.debug('iptables._ports == %s', self._ports)
+        else:
+            self._ports = None
+        log.debug('iptables._ports == %s', self._ports)
 
-        if 'ports' in conf['match']:
+        if 'protocol' in conf['match']:
             self._proto = conf['match']['protocol']
-            log.debug('iptables._proto == %s', self._proto)
+        else:
+            self._proto = None
+        log.debug('iptables._proto == %s', self._proto)
 
         if 'sources' in conf['match']:
             self._sources = [ip_network(ip) for ip in conf['match']['sources']]
-            log.debug('iptables._sources == %s', self._sources)
+        else:
+            self._sources = None
+        log.debug('iptables._sources == %s', self._sources)
 
         if 'destinations' in conf['match']:
             self._dests = [ip_network(ip) for ip in conf['match']['sources']]
-            log.debug('iptables._dests == %s', self._dests)
+        else:
+            self._dests = None
+        log.debug('iptables._dests == %s', self._dests)
 
         self._rule4 = iptc.Rule()
         self._rule6 = iptc.Rule6()
+
+        self._uuids: List[str] = []
 
         try:
             self.rule_builder()

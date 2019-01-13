@@ -15,7 +15,7 @@ if os.path.exists('README.rst'):
 
 setup(
     name='skutter',
-    version='0.6',
+    version='0.8',
     packages=find_packages(),
     scripts=['bin/skutter'],
     entry_points={

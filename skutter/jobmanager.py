@@ -10,27 +10,22 @@ POSITIVE = True
 
 
 class JobManager(object):
-    _check_module = ''
-    _check_config = {}
-
-    _check = None
-
-    _paction_module = ''
-    _paction_config = {}
-
-    _paction = None
-
-    _naction_module = ''
-    _naction_config = {}
-
-    _naction = None
-
-    _name = None
-    _running = False
-    _current_state = None
-
     def __init__(self, name: str):
         self._name = name
+        self._running = False
+        self._current_state = None
+
+        self._check = None
+        self._check_module = None
+        self._check_config = None
+
+        self._naction = None
+        self._naction_module = None
+        self._naction_config = None
+
+        self._paction = None
+        self._paction_module = None
+        self._paction_config = None
 
     def get_name(self):
         return self._name
