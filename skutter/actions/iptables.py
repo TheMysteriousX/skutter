@@ -158,12 +158,20 @@ class IPTables(ActionBase):
     def del_rule4(self, rule: iptc.Rule) -> bool:
         log.info("Deleting rule4 from chain")
         if self._chain4 is not None:
-            return self._chain4.delete_rule(rule)
+            try:
+                return self._chain4.delete_rule(rule)
+            except iptc.ip4tc.IPTCError:
+                log.error('Unable to remove rule - rule may have been removed outside of skutter')
+                return False
 
     def del_rule6(self, rule: iptc.Rule6) -> bool:
         log.info("Deleting rule6 from chain")
         if self._chain6 is not None:
-            return self._chain6.delete_rule(rule)
+            try:
+                return self._chain6.delete_rule(rule)
+            except iptc.ip6tc.IPTCError:
+                log.error('Unable to remove rule - rule may have been removed outside of skutter')
+                return False
 
     def insert_rule4(self, rule: iptc.Rule) -> bool:
         log.info("Inserting rule4 into chain")
@@ -187,7 +195,7 @@ class IPTables(ActionBase):
         log.info("Cleaning up all rule4 with comment prefix: %s", Configuration.get('self-uuid'))
 
         if self._chain4 is not None:
-            for rule in self._chain4:
+            for rule in self._chain4.rules:
                 for match in rule.matches:
                     if match.name == 'comment':
                         if match.parameters['comment'].startswith(Configuration.get('self-uuid')):
@@ -197,7 +205,7 @@ class IPTables(ActionBase):
         log.info("Cleaning up all rule6 with comment prefix: %s", Configuration.get('self-uuid'))
 
         if self._chain6 is not None:
-            for rule in self._chain6:
+            for rule in self._chain6.rules:
                 for match in rule.matches:
                     if match.name == 'comment':
                         if match.parameters['comment'].startswith(Configuration.get('self-uuid')):

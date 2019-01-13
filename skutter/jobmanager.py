@@ -100,9 +100,14 @@ class JobManager(object):
         log.debug("Executing check %s with config %s", self._check_module, self._check_config)
 
         if self._current_state is None:
-            log.debug("Oneshot polling to establish current state")
+            log.debug('Oneshot polling to establish current state')
             self._current_state = self._check.driver.oneshot()
-            return self
+
+            log.info('Initial check result is %s, running action plugin once', 'POSITIVE' if self._current_state == POSITIVE else 'NEGATIVE')
+            if self._current_state == POSITIVE:
+                self._paction.driver.do()
+            else:
+                self._naction.driver.do()
 
         self._running = True
         self._current_state = await self._check.driver.poll(self._current_state)
