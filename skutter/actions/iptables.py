@@ -82,8 +82,7 @@ class IPTables(ActionBase):
         self._rule4 = iptc.Rule()
         self._rule6 = iptc.Rule6()
 
-        log.info('Built IPTables rule: %s', self._rule4)
-        log.info('Built IPTables rule: %s', self._rule6)
+        self.rule_builder()
 
     def rule_builder(self):
         if not Configuration.get('v6-only'):
@@ -112,6 +111,13 @@ class IPTables(ActionBase):
                 r.dst = ','.join([ip.compressed for ip in self._dests if isinstance(IPv4Network, ip)])
                 log.debug('Set rule4 src: %s', r.dst)
 
+            uid = str(uuid.uuid4())
+            m = r.create_match("comment")
+            m.comment(f"{Configuration.get('self-uuid')}-{uid}")
+
+            self._uuids.append(uid)
+
+        log.info('Built IPTables rule: %s', self._rule4)
 
     def rule_builder6(self):
         with self._rule6 as r:
@@ -139,6 +145,8 @@ class IPTables(ActionBase):
             m.comment(f"{Configuration.get('self-uuid')}-{uid}")
 
             self._uuids.append(uid)
+
+        log.info('Built IPTables rule: %s', self._rule6)
 
     def del_rule4(self, rule: iptc.Rule) -> bool:
         log.info("Deleting rule4 from chain")
