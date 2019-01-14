@@ -122,6 +122,10 @@ class JobManager(object):
             self._paction.driver.undo()
             self._naction.driver.do()
 
-    def __del__(self):
-        self._naction.driver.undo()
-        self._paction.driver.undo()
+    def cleanup(self):
+        log.info('Reverting actions to base state')
+        if self._current_state == POSITIVE:
+            self._paction.driver.undo()
+        else:
+            self._naction.driver.undo()
+

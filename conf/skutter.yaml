@@ -1,6 +1,7 @@
 service:
   systemd: False
   rundir: '/var/run/skutter/'
+  pidfile: '/var/run/skutter/skutter.pid'
   v6-only: True
   self-uuid: '26c00d92-17fd-429c-9165-e94c37468b0f'
 jobs:
@@ -14,7 +15,7 @@ jobs:
       config:
         target: accept
         match:
-          ports: [ 80, 443 ]
+          ports: 80
           protocol: 'tcp'
           sources: [ '0.0.0.0/0', '::/0']
     negative-action:
@@ -22,6 +23,6 @@ jobs:
       config:
         target: drop
         match:
-          port: [ 80, 443 ]
+          port: 80
           protocol: 'tcp'
           sources: [ '0.0.0.0/0', '::/0']

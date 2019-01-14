@@ -1,0 +1,14 @@
+[Unit]
+Description=Daemon for performing menial tasks
+After=syslog.target network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/bin/scl enable rh-python36 -- /opt/rh/rh-python36/root/usr/bin/skutter
+PrivateTmp=true
+RuntimeDirectory=skutter
+RuntimeDirectoryMode=755
+
+[Install]
+WantedBy=multi-user.target

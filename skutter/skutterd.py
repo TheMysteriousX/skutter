@@ -66,8 +66,7 @@ class Skutterd(object):
         cls._loop.close()
         log.debug('Event loop terminated')
 
-        logging.shutdown()
-        sys.exit(0)
+        [j.cleanup() for j in cls._jobs]
 
     @classmethod
     def terminate(cls):
@@ -81,6 +80,7 @@ class Skutterd(object):
         cls.env()
         cls.fork()
         cls.descriptors()
+        cls.writepid()
 
     @classmethod
     def fork(cls) -> None:
@@ -177,6 +177,11 @@ class Skutterd(object):
         cls._run = False
 
     @classmethod
+    def writepid(cls):
+        with open(Configuration.get('pidfile'), 'w') as f:
+            f.write(str(os.getpid()))
+
+    @classmethod
     def logging(cls) -> None:
         log.critical('Configuring logging')
         try:
@@ -206,7 +211,7 @@ class Skutterd(object):
             cls.root_logger.addHandler(cls.console)
             #cls.root_logger.addHandler(cls.system)
             # Sysloghandler is garbage
-            
+
         except Exception as e:
             print('Initialising logger failed; aborting startup as I can\'t tell you when I\'m online!\n')
             print('The underlying exception was: {}\n\n\n'.format(e))

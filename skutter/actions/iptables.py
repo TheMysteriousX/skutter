@@ -108,8 +108,8 @@ class IPTables(ActionBase):
             log.debug('Set rule4 proto: %s', self._rule4.protocol)
 
         if self._ports:
-            self._rule4.dport = ','.join([str(i) for i in self._ports])
-            log.debug('Set rule4 dport: %s', self._rule4.dport)
+            self._rule4.create_match(self._rule4.protocol).dport = self._ports
+            log.debug('Set rule4 dport: %s', self._ports)
 
         if self._sources:
             self._rule4.src = ','.join([ip.compressed for ip in self._sources if isinstance(ip, IPv4Network)])
@@ -136,8 +136,8 @@ class IPTables(ActionBase):
             log.debug('Set rule6 proto: %s', self._rule6.protocol)
 
         if self._ports:
-            self._rule6.dport = ','.join([str(i) for i in self._ports])
-            log.debug('Set rule6 dport: %s', self._rule6.dport)
+            self._rule6.create_match(self._rule6.protocol).dport = self._ports
+            log.debug('Set rule6 dport: %s', self._ports)
 
         if self._sources:
             self._rule6.src = ','.join([ip.compressed for ip in self._sources if isinstance(ip, IPv6Network)])
@@ -211,6 +211,3 @@ class IPTables(ActionBase):
                         if match.parameters['comment'].startswith(Configuration.get('self-uuid')):
                             self.del_rule6(rule)
 
-    def __del__(self):
-        self.cleanup4()
-        self.cleanup6()
