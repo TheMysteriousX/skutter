@@ -34,6 +34,7 @@ setup(
         'PyYAML',
         'six',
         'stevedore',
+        'toml',
     ],
 
     license='GNU GPL v3',

@@ -159,6 +159,7 @@ class IPTables(ActionBase):
         log.info("Deleting rule4 from chain")
         if self._chain4 is not None:
             try:
+                self._table4.refresh()
                 return self._chain4.delete_rule(rule)
             except iptc.ip4tc.IPTCError:
                 log.error('Unable to remove rule - rule may have been removed outside of skutter')
@@ -166,9 +167,11 @@ class IPTables(ActionBase):
 
     def del_rule6(self, rule: iptc.Rule6) -> bool:
         log.info("Deleting rule6 from chain")
+
         if self._chain6 is not None:
             try:
-                return self._chain6.delete_rule(rule)
+                self._table6.refresh()
+                return self._chain4.delete_rule(rule)
             except iptc.ip6tc.IPTCError:
                 log.error('Unable to remove rule - rule may have been removed outside of skutter')
                 return False

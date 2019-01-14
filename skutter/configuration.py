@@ -19,6 +19,7 @@ class Configuration(object):
         'conf': '/etc/skutter/skutter.yaml'
     }
 
+    # ToDo: this method needs error handling: FileNotFoundError: [Errno 2] No such file or directory: '/etc/skutter/skutter.yaml'
     @classmethod
     def load(cls, path: str) -> None:
         log.info("Loading configuration from %s", path)
