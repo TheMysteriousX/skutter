@@ -121,3 +121,7 @@ class JobManager(object):
         else:
             self._paction.driver.undo()
             self._naction.driver.do()
+
+    def __del__(self):
+        self._naction.driver.undo()
+        self._paction.driver.undo()

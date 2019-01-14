@@ -62,7 +62,12 @@ class Skutterd(object):
         cls.loop()
 
         # We're exiting, close the event loop
+        log.debug('Terminating event loop')
         cls._loop.close()
+        log.debug('Event loop terminated')
+
+        logging.shutdown()
+        sys.exit(0)
 
     @classmethod
     def terminate(cls):
@@ -129,6 +134,7 @@ class Skutterd(object):
                     log.debug("Tasks were cancelled, was a signal received?")
 
             if cls.handle_signal():
+                log.info('Terminal signal received, leaving main loop')
                 break
 
     @classmethod
@@ -172,33 +178,35 @@ class Skutterd(object):
 
     @classmethod
     def logging(cls) -> None:
+        log.critical('Configuring logging')
         try:
             # Grab the root logger so we can set the logging configuration globally
-            l = logging.getLogger('skutter')
-            l.setLevel(logging.DEBUG)
+            cls.root_logger = logging.getLogger('skutter')
+            cls.root_logger.setLevel(logging.DEBUG)
 
             # Define the log format
-            console_format = logging.Formatter('%(asctime)s - %(name)s - %(process)d - %(levelname)s - %(message)s')
-            system_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+            cls.console_format = logging.Formatter('%(asctime)s - %(name)s - %(process)d - %(levelname)s - %(message)s')
+            cls.system_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
 
             # Define console handler
-            console = logging.StreamHandler()
-            console.setLevel(logging.DEBUG)
-            console.setFormatter(console_format)
+            cls.console = logging.StreamHandler()
+            cls.console.setLevel(logging.DEBUG)
+            cls.console.setFormatter(cls.console_format)
 
             # Define system handler
             if JournalHandler:
-                system = JournalHandler()
+                cls.system = JournalHandler()
             else:
-                system = SysLogHandler()
+                cls.system = SysLogHandler()
 
-            system.setLevel(logging.DEBUG)
-            system.setFormatter(system_format)
+            cls.system.setLevel(logging.DEBUG)
+            cls.system.setFormatter(cls.system_format)
 
             # Attach handlers
-            l.addHandler(console)
-            l.addHandler(system)
-
+            cls.root_logger.addHandler(cls.console)
+            #cls.root_logger.addHandler(cls.system)
+            # Sysloghandler is garbage
+            
         except Exception as e:
             print('Initialising logger failed; aborting startup as I can\'t tell you when I\'m online!\n')
             print('The underlying exception was: {}\n\n\n'.format(e))
@@ -206,8 +214,3 @@ class Skutterd(object):
             traceback.print_exc()
 
             sys.exit(Configuration.BROKEN_LOGGING)
-
-# Signal Handlers
-signal.signal(signal.SIGHUP, Skutterd.signal)
-signal.signal(signal.SIGINT, Skutterd.signal)
-signal.signal(signal.SIGTERM, Skutterd.signal)
